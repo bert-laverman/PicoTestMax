@@ -28,9 +28,12 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 # Set CMake defines for the Raspberry Pi Pico and required components
 set(TARGET_PICO on)
-set(HAVE_I2C on)
+
+set(HAVE_I2C off)
 set(HAVE_SPI on)
 set(HAVE_PWM off)
+
+set(HAVE_LED on)
 set(HAVE_MAX7219 on)
 set(HAVE_LCD2X16 off)
 
