@@ -62,32 +62,34 @@ static std::array<std::array<uint8_t, devices::MAX7219_DIGITS>, 8> testValues2 =
     {{ 0x0f, 0x0f, 0x0f, 0x0a, 0x0a, 0x0f, 0x0f, 0x0f }}
 }};
 
-static void runTestPattern(RaspberryPi& berry, std::shared_ptr<LocalMAX7219> max)
+
+
+static void runTestPattern(RaspberryPi& berry, LocalMAX7219<PicoSPI>& max)
 {
     printf("Clearing display.\n");
-    max->writeImmediately(false);
-    max->clear();
-    max->sendData();
+    max.writeImmediately(false);
+    max.clear();
+    max.sendData();
 
     printf("Running first test pattern.\n");
     for (unsigned n1 = 0; n1 < 8; n1++) {
-        for (uint8_t mod = 0; mod < max->numDevices(); mod++) {
-            max->setNumber(mod, testValues1[n1]);
+        for (uint8_t mod = 0; mod < max.numDevices(); mod++) {
+            max.setNumber(mod, testValues1[n1]);
         }
-        max->sendData();
+        max.sendData();
         berry.sleepMs(300);
     }
 
     printf("Running second test pattern.\n");
     for (unsigned n2 = 0; n2 < 8; n2++) {
-        for (uint8_t mod = 0; mod < max->numDevices(); mod++) {
-            max->setBuffer(mod, testValues2[n2]);
+        for (uint8_t mod = 0; mod < max.numDevices(); mod++) {
+            max.setBuffer(mod, testValues2[n2]);
         }
-        max->sendData();
+        max.sendData();
         berry.sleepMs(300);
     }
-    max->clear();
-    max->sendData();
+    max.clear();
+    max.sendData();
 
     printf("Display tests done.\n");
 }
@@ -107,7 +109,7 @@ static void errorExit(RaspberryPi& berry, components::LocalLed& led, unsigned nu
 }
 
 
-static constexpr uint8_t NUM_MODULES = 3;
+static constexpr uint8_t NUM_MODULES = 1;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char*argv[])
 {
@@ -122,15 +124,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char*argv[])
 
 
     try {
-        auto spi = berry.addSPI<PicoSPI>("pico-spi-0");
-        // spi->verbose(true);
-        spi->baudRate(500000);
+        PicoSPI spi;
+        // spi.verbose(true);
+        spi.baudRate(500000);
 
-        auto max = std::make_shared<devices::LocalMAX7219>();
-        spi->device(max);
+        LocalMAX7219<PicoSPI> max(spi);
 
-        max->numDevices(NUM_MODULES);
-        max->reset();
+        max.numDevices(NUM_MODULES);
+        max.reset();
         berry.sleepMs(500);
 
         runTestPattern(berry, max);
