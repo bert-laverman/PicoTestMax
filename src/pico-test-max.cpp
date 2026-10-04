@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <boards/pico.h>
 #include <pico/stdlib.h>
 #include <pico/unique_id.h>
 
